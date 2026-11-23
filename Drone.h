@@ -1,6 +1,6 @@
 // Drone.h
 // ESE 224 Fall 2026 Final Project (Part II) starter code
-// Team members: TODO
+// Team members: Sophia Rahman and Nafisa Patwary
 
 #ifndef DRONE_H
 #define DRONE_H
