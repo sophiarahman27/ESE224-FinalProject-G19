@@ -14,9 +14,16 @@ using namespace std;
 
 Fleet::Fleet() : head(nullptr), count(0) {}
 
-Fleet::~Fleet()
-{
-    // TODO: delete every node AND every unit (the Fleet owns the units)
+Fleet::~Fleet(){
+    UnitNode* curr = head;
+        while (curr != nullptr) {
+            UnitNode* nextNode = curr->next;
+            delete curr->unit; // Fleet owns the DeliveryUnit objects
+            delete curr;
+            curr = nextNode;
+        }
+        head = nullptr;
+        count = 0;
 }
 
 // ---------- Linked list ----------
@@ -32,7 +39,7 @@ bool Fleet::addUnit(DeliveryUnit* u){
         return false;
     }
 
-    Node* newNode = new Node{u, nullptr};
+    UnitNode* newNode = new UnitNode{u, nullptr};
 
     //case 1, empty list or new ID belongs before curent head (ascending)
     if (head == nullptr || id < head->unit->getID()) {
@@ -42,7 +49,7 @@ bool Fleet::addUnit(DeliveryUnit* u){
 
     //case 2, walk forward until curr->next has a larger ID or reached end node
     else {
-        Node* curr = head;
+        UnitNode* curr = head;
         while (curr->next != nullptr && curr->next->unit->getID() < id) {
             curr = curr->next;
         }
@@ -56,63 +63,116 @@ bool Fleet::addUnit(DeliveryUnit* u){
     return true;
 }
 
-bool Fleet::removeUnit(int id)
-{
-Node* curr = head;
-    Node* prev = nullptr;
+bool Fleet::removeUnit(int id){
+    UnitNode* curr = head;
+    UnitNode* prev = nullptr;
 
-    // Traverse the sorted list until we reach 'id' or pass where it would be
+    //walk through the list to find the target ID
     while (curr != nullptr && curr->unit->getID() < id) {
         prev = curr;
         curr = curr->next;
     }
 
-    // Target ID was not found in the list
+    //if target ID not found in list, cannot be removed
     if (curr == nullptr || curr->unit->getID() != id) {
         cout << "Unit ID " << id << " not found." << endl;
         return false;
     }
 
-    // Unlink 'curr' from the singly linked list
+    //unlink curr from linked list
     if (prev == nullptr) {
-        head = curr->next;       // Removing the head node
+        head = curr->next;       //remove head node
     } else {
-        prev->next = curr->next; // Bypass 'curr' in the middle or end
+        prev->next = curr->next; //bypass curr
     }
 
-    // Remove pointer from BST index BEFORE deleting the unit object itself
+    //remove pointer nbefore removing the object
     index.remove(id);
-    delete curr->unit; // Fleet owns the DeliveryUnit, so free it
-    delete curr;       // Free the linked list node
+    delete curr->unit; //free the unit from fleet
+    delete curr;       //free the linked list node
     count--;
     return true;
 }
 
 DeliveryUnit* Fleet::findQuiet(int id) const
 {
-    // TODO: list lookup without printing (used by addUnit and undo)
+    UnitNode* curr = head;
+    while (curr != nullptr) {
+        int currID = curr->unit->getID();
+        if (currID == id) return curr->unit; //found
+        if (currID > id) return nullptr;     //early exit
+        curr = curr->next;
+    }
     return nullptr;
 }
 
-DeliveryUnit* Fleet::findByID(int id) const
-{
-    // TODO: one comparison per node examined; stop at the first larger ID; print the count
+DeliveryUnit* Fleet::findByID(int id) const{
+    int comparisons = 0;
+    UnitNode* curr = head;
+    while (curr != nullptr) {
+        comparisons++; //one comparison per examined node
+        int currID = curr->unit->getID();
+        if (currID == id) {
+            cout << "Linked list search, found ID " << id
+                 << " after " << comparisons << " comparisons." << endl;
+            return curr->unit;
+        }
+        //stop at first larger ID
+        if (currID > id) {
+            break;
+        }
+        curr = curr->next;
+    }
+    cout << "Linked list search, ID " << id
+         << " not found after " << comparisons << " comparisons." << endl;
     return nullptr;
 }
 
 DeliveryUnit* Fleet::searchTree(int id) const
 {
-    // TODO: index.search(...) and print the count
-    return nullptr;
+    int comparisons = 0;
+    DeliveryUnit* found = index.search(id, comparisons);
+
+    if (found != nullptr) {
+        cout << "BST search: found ID " << id << " after " << comparisons << " comparisons." << endl;
+    } 
+    else {
+        cout << "BST search: ID " << id << " not found after " << comparisons << " comparisons." << endl;
+    }
+    return found;
+
 }
 
 int Fleet::getSize() const { return count; }
 
-void Fleet::displayAll() const { /* TODO */ }
+void Fleet::displayAll() const {
+    if (head == nullptr) {
+        cout << "Fleet is empty." << endl;
+        return;
+    }
+
+    UnitNode* curr = head;
+    while (curr != nullptr) {
+        curr->unit->display();
+        curr = curr->next;
+    } 
+}
 
 void Fleet::displayTree() const
 {
-    // TODO: in-order, pre-order, post-order, and height
+    cout << "In-order:   ";
+    index.inOrder();
+    cout << endl;
+
+    cout << "Pre-order:  ";
+    index.preOrder();
+    cout << endl;
+
+    cout << "Post-order: ";
+    index.postOrder();
+    cout << endl;
+
+    cout << "Height: " << index.height() << " (" << count << " units)" << endl;
 }
 
 void Fleet::countByStatus() const { /* TODO */ }
