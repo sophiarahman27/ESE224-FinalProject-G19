@@ -1,6 +1,6 @@
 // Fleet.cpp
 // ESE 224 Fall 2026 Final Project (Part II) starter code
-// Team members: TODO
+// Team members: Sophia Rahman, Nafisa Patwary
 //
 // The fleet is a singly linked list kept in ascending ID order (Section 5) plus the dispatch center (Section 7).
 // No vector or other STL containers: use your own list, Queue, Stack, and DroneTree.
@@ -20,17 +20,72 @@ Fleet::~Fleet()
 }
 
 // ---------- Linked list ----------
-bool Fleet::addUnit(DeliveryUnit* u)
-{
-    // TODO: sorted insert by ID and insert into 'index'; on a duplicate ID print a message, delete u, return false
-    delete u;
-    return false;
+bool Fleet::addUnit(DeliveryUnit* u){
+    if (u == nullptr) return false;
+
+    int id = u->getID();
+
+    //check if ID already exists in list
+    if (findQuiet(id) != nullptr) {
+        cout << "Duplicate ID " << id << ": unit not added." << endl;
+        delete u;
+        return false;
+    }
+
+    Node* newNode = new Node{u, nullptr};
+
+    //case 1, empty list or new ID belongs before curent head (ascending)
+    if (head == nullptr || id < head->unit->getID()) {
+        newNode->next = head;
+        head = newNode;
+    } 
+
+    //case 2, walk forward until curr->next has a larger ID or reached end node
+    else {
+        Node* curr = head;
+        while (curr->next != nullptr && curr->next->unit->getID() < id) {
+            curr = curr->next;
+        }
+        newNode->next = curr->next;
+        curr->next = newNode;
+    }
+
+    //keep BST index synchronized with linked list and update size
+    index.insert(u);
+    count++;
+    return true;
 }
 
 bool Fleet::removeUnit(int id)
 {
-    // TODO: unlink, remove from 'index', delete the unit and the node
-    return false;
+Node* curr = head;
+    Node* prev = nullptr;
+
+    // Traverse the sorted list until we reach 'id' or pass where it would be
+    while (curr != nullptr && curr->unit->getID() < id) {
+        prev = curr;
+        curr = curr->next;
+    }
+
+    // Target ID was not found in the list
+    if (curr == nullptr || curr->unit->getID() != id) {
+        cout << "Unit ID " << id << " not found." << endl;
+        return false;
+    }
+
+    // Unlink 'curr' from the singly linked list
+    if (prev == nullptr) {
+        head = curr->next;       // Removing the head node
+    } else {
+        prev->next = curr->next; // Bypass 'curr' in the middle or end
+    }
+
+    // Remove pointer from BST index BEFORE deleting the unit object itself
+    index.remove(id);
+    delete curr->unit; // Fleet owns the DeliveryUnit, so free it
+    delete curr;       // Free the linked list node
+    count--;
+    return true;
 }
 
 DeliveryUnit* Fleet::findQuiet(int id) const
