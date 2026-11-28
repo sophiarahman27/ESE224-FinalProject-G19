@@ -1,0 +1,17 @@
+D Ion 840 Condor 55.4 10.0 22 28 CHARGING
+H Titanus 827 Hauler 62.8 18.0 0 16 IDLE
+D Halo 195 Falcon 81.3 5.0 7 27 IDLE
+D Spark 212 Falcon 80.2 5.0 24 1 IDLE
+D Swift 326 Falcon 90.3 5.0 3 10 IDLE
+H Hercules 188 Hauler 71.3 20.0 5 9 IDLE
+D Atlas 277 Condor 53.7 10.0 21 24 MAINTENANCE
+D Rocket 903 Condor 55.2 10.0 16 11 IDLE
+D Pulse 642 Falcon 36.5 5.0 19 11 IDLE
+H Mammoth 497 Hauler 59.6 22.0 10 4 IDLE
+D Helix 239 Condor 42.0 10.0 30 21 IDLE
+D Vortex 947 Condor 41.1 10.0 19 15 IDLE
+D Flare 179 Falcon 89.9 5.0 9 25 IDLE
+D Apex 926 Falcon 58.3 5.0 1 29 IDLE
+D Aurora 223 Condor 89.8 10.0 28 19 IDLE
+D Dart 595 Falcon 81.0 5.0 8 28 IDLE
+D Arrow 417 Falcon 53.5 5.0 17 6 IDLE
